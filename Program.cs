@@ -1,55 +1,100 @@
 using AKP.Data;
+using AKP.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+// Add MVC services with Views
+builder.Services.AddControllersWithViews();
 
 // Configure SQLite Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure CORS to easily allow frontend development servers (e.g., Vite/React/Vue)
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
-// Automatically ensure the SQLite database and tables are created on startup
+// Ensure SQLite database is created and seed initial Majors & Students
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.EnsureCreated();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.EnsureCreated();
+
+        // 1. Seed Majors if empty
+        if (!context.Majors.Any())
+        {
+            var majorCe = new Major { Title = "مهندسی کامپیوتر", Code = "CE-101" };
+            var majorEe = new Major { Title = "مهندسی برق", Code = "EE-102" };
+            var majorAi = new Major { Title = "هوش مصنوعی و رباتیک", Code = "AI-103" };
+            var majorDs = new Major { Title = "علوم داده", Code = "DS-104" };
+
+            context.Majors.AddRange(majorCe, majorEe, majorAi, majorDs);
+            context.SaveChanges();
+
+            // 2. Seed Sample Students with foreign keys
+            if (!context.Students.Any())
+            {
+                context.Students.AddRange(
+                    new Student
+                    {
+                        StudentNumber = "40112345",
+                        FirstName = "سارا",
+                        LastName = "رضایی",
+                        NationalCode = "0012345678",
+                        MajorId = majorCe.Id,
+                        EnrollmentDate = new DateTime(2023, 9, 23),
+                        IsActive = true
+                    },
+                    new Student
+                    {
+                        StudentNumber = "40054321",
+                        FirstName = "علی",
+                        LastName = "محمدی",
+                        NationalCode = "0087654321",
+                        MajorId = majorEe.Id,
+                        EnrollmentDate = new DateTime(2022, 9, 23),
+                        IsActive = true
+                    },
+                    new Student
+                    {
+                        StudentNumber = "40298765",
+                        FirstName = "زهرا",
+                        LastName = "حسینی",
+                        NationalCode = "0055443322",
+                        MajorId = majorAi.Id,
+                        EnrollmentDate = new DateTime(2024, 9, 22),
+                        IsActive = false
+                    }
+                );
+                context.SaveChanges();
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "خطایی در مقداردهی اولیه پایگاه داده رخ داد.");
+    }
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Configure HTTP request pipeline
+if (!app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
-app.UseCors();
-
-// Enable serving default files (e.g. index.html) and static assets from wwwroot
-app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllers();
-
-// SPA fallback: serves index.html for non-API client-side routes
-app.MapFallbackToFile("index.html");
+// Default route
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Students}/{action=Index}/{id?}");
 
 app.Run();
