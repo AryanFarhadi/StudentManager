@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - سامانه جامع امور دانشجویی</title>
+
+    <!-- Persian Font: Vazirmatn -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Local Bootstrap 5.3 RTL (Local file, zero CDN failure risk) -->
+    <link rel="stylesheet" href="~/css/bootstrap.rtl.min.css" asp-append-version="true" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Hallmark & UI/UX Pro Max Enterprise Dashboard Stylesheet -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <!-- 1. Right Sidebar (Desktop Fixed, Mobile Drawer) -->
+        <aside class="app-sidebar" id="appSidebar">
+            <!-- Brand -->
+            <a class="sidebar-header" asp-controller="Students" asp-action="Index">
+                <div class="sidebar-brand-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <div class="sidebar-brand-text">
+                    <span class="sidebar-brand-title">پرتال مدیریت آموزشی</span>
+                    <span class="sidebar-brand-sub">سامانه جامع دانشجویان دانشگاه</span>
+                </div>
+            </a>
+
+            <!-- Navigation Groups -->
+            <div class="sidebar-content">
+                <!-- Group 1: میزکار -->
+                <div>
+                    <div class="sidebar-group-title">میزکار و آمار</div>
+                    <ul class="sidebar-nav-list">
+                        <li>
+                            <a class="sidebar-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Students" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")" 
+                               asp-controller="Students" asp-action="Index">
+                                <span><i class="bi bi-grid-1x2-fill"></i> داشبورد و فهرست</span>
+                                <span class="badge bg-light text-dark font-tabular small">ثبت‌نام</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Group 2: امور دانشجویی و دپارتمان‌ها -->
+                <div>
+                    <div class="sidebar-group-title">مدیریت آموزشی</div>
+                    <ul class="sidebar-nav-list">
+                        <li>
+                            <a class="sidebar-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Students" && ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "active" : "")" 
+                               asp-controller="Students" asp-action="Create">
+                                <span><i class="bi bi-person-plus-fill"></i> ثبت دانشجوی جدید</span>
+                                <i class="bi bi-plus-lg text-white-50"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Majors" ? "active" : "")" 
+                               asp-controller="Majors" asp-action="Index">
+                                <span><i class="bi bi-mortarboard-fill"></i> رشته‌های تحصیلی</span>
+                                <span class="badge bg-light text-dark font-tabular small">دپارتمان</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small">
+                    <span>نگارش دانشگاهی</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-tabular">1404.1</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. Main Content Wrapper -->
+        <div class="app-main-wrapper">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <!-- Mobile Hamburger Button -->
+                    <button class="btn btn-sm btn-light border d-lg-none" type="button" onclick="toggleSidebar()">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <!-- Current Academic Term Chip -->
+                    <div class="d-none d-sm-flex align-items-center gap-2 text-secondary small bg-light px-3 py-1 rounded-pill border">
+                        <i class="bi bi-calendar-event text-primary"></i>
+                        <span>نیم‌سال تحصیلی جاری: <strong>مهر ۱۴۰۴ - ۱۴۰۵</strong></span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- Operator Profile Badge -->
+                    <div class="user-profile-badge">
+                        <div class="user-avatar-initials">م‌آ</div>
+                        <div class="d-flex flex-column text-end">
+                            <span class="user-meta-name">مدیر آموزش دانشگاه</span>
+                            <span class="user-meta-role">دسترسی ادمین کل</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Canvas Body -->
+            <main class="app-content-body">
+                <!-- Toast Alerts -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-toast alert-toast-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill fs-5"></i>
+                        <div class="flex-grow-1 fw-semibold">
+                            @TempData["SuccessMessage"]
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-toast alert-toast-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+                        <div class="flex-grow-1 fw-semibold">
+                            @TempData["ErrorMessage"]
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer-bar">
+                <div>
+                    <span>سامانه امور دانشجویان &copy; @DateTime.Now.Year · کلیه حقوق برای پرتال دانشگاهی محفوظ است.</span>
+                </div>
+
+            </footer>
+        </div>
+    </div>
+
+    <!-- Local Bootstrap Bundle JS -->
+    <script src="~/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('show');
+            }
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
