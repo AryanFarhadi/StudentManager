@@ -44,6 +44,10 @@ publish/
 *.binlog
 [Ll]ogs/
 
+## SQLite temporary runtime journals (keep app.db)
+*.db-shm
+*.db-wal
+
 ## Test / Coverage Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
