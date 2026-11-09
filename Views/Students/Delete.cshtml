@@ -1,0 +1,114 @@
+@model AKP.Models.Student
+
+@{
+    ViewData["Title"] = "حذف پرونده دانشجو";
+    var initial = !string.IsNullOrEmpty(Model.FirstName) ? Model.FirstName.Substring(0, 1) : "د";
+}
+
+<!-- Page Header Bar -->
+<div class="page-header-pro">
+    <div class="page-header-title-box">
+        <ul class="breadcrumb-pro">
+            <li><a asp-action="Index">سامانه</a></li>
+            <li class="divider"><i class="bi bi-chevron-left"></i></li>
+            <li><a asp-action="Index">میزکار دانشجویان</a></li>
+            <li class="divider"><i class="bi bi-chevron-left"></i></li>
+            <li class="text-danger fw-bold">حذف پرونده</li>
+        </ul>
+        <h1 class="text-danger">حذف پرونده دانشجویی</h1>
+        <p>تأیید نهایی برای حذف سوابق تحصیلی دانشجو از سامانه دانشگاهی</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-brand btn-brand-neutral">
+            <i class="bi bi-arrow-right"></i>
+            <span>بازگشت به فهرست</span>
+        </a>
+    </div>
+</div>
+
+<div class="form-bounded-card">
+    <div class="panel-pro border-danger">
+        <div class="panel-pro-header bg-danger-subtle text-danger">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <h2 class="h6 fw-bold mb-0">آیا از حذف این پرونده دانشجویی اطمینان دارید؟</h2>
+            </div>
+            <span class="badge bg-danger text-white">غیرقابل بازگشت</span>
+        </div>
+
+        <div class="p-4 p-md-5">
+            <!-- Student Identity Banner -->
+            <div class="p-3 bg-light rounded border d-flex align-items-center gap-3 mb-4">
+                <div class="student-avatar" style="width: 50px; height: 50px; font-size: 1.3rem;">
+                    @initial
+                </div>
+                <div>
+                    <h3 class="h6 fw-bold text-dark mb-1">@Model.FirstName @Model.LastName</h3>
+                    <div class="text-muted small">
+                        <span>شماره دانشجویی: <strong class="font-tabular text-dark">@Model.StudentNumber</strong></span>
+                        <span class="mx-2">·</span>
+                        <span>رشته: <strong>@(Model.Major?.Title ?? "تعیین نشده")</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Table -->
+            <div class="table-responsive border rounded overflow-hidden mb-4">
+                <table class="table table-bordered mb-0" style="font-size: 0.875rem;">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light text-secondary" style="width: 35%;">شماره دانشجویی:</th>
+                            <td class="font-tabular fw-bold">@Model.StudentNumber</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-secondary">نام و نام خانوادگی:</th>
+                            <td class="fw-semibold">@Model.FirstName @Model.LastName</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-secondary">کد ملی:</th>
+                            <td class="font-tabular">@Model.NationalCode</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-secondary">رشته تحصیلی:</th>
+                            <td>@(Model.Major?.Title ?? "تعیین نشده")</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-secondary">تاریخ پذیرش و ثبت‌نام:</th>
+                            <td class="font-tabular">@Model.EnrollmentDate.ToString("yyyy/MM/dd")</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-secondary">وضعیت پرونده:</th>
+                            <td>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge-status badge-status-active">فعال (در حال تحصیل)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status badge-status-inactive">غیرفعال</span>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Form Submit -->
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-action="Index" class="btn-brand btn-brand-neutral">
+                        <i class="bi bi-x-lg"></i>
+                        <span>انصراف و بازگشت</span>
+                    </a>
+                    <button type="submit" class="btn-brand btn-brand-danger px-4 shadow-sm">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>بله، پرونده دانشجو حذف شود</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

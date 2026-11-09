@@ -1,0 +1,259 @@
+@model AKP.Models.StudentIndexViewModel
+
+@{
+    ViewData["Title"] = "میزکار و مدیریت دانشجویان";
+}
+
+<!-- Page Header Bar -->
+<div class="page-header-pro">
+    <div class="page-header-title-box">
+        <ul class="breadcrumb-pro">
+            <li><a asp-action="Index">سامانه</a></li>
+            <li class="divider"><i class="bi bi-chevron-left"></i></li>
+            <li class="text-dark fw-bold">میزکار دانشجویان</li>
+        </ul>
+        <h1>میزکار امور آموزشی و پرونده‌های تحصیلی</h1>
+        <p>مدیریت جامع، جستجوی سوابق، بررسی وضعیت تحصیلی و دپارتمان‌های آموزشی</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-controller="Majors" asp-action="Index" class="btn-brand btn-brand-neutral">
+            <i class="bi bi-mortarboard"></i>
+            <span>مدیریت رشته‌ها</span>
+        </a>
+        <a asp-action="Create" class="btn-brand btn-brand-primary">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>ثبت‌نام دانشجوی جدید</span>
+        </a>
+    </div>
+</div>
+
+<!-- 1. Refined Dashboard Metric Cards -->
+<div class="row g-3 mb-4">
+    <!-- Card 1: Total Students -->
+    <div class="col-12 col-md-4">
+        <div class="metric-card-pro metric-card-blue">
+            <div class="metric-card-head">
+                <div>
+                    <div class="metric-title">کل پرونده‌های ثبتی</div>
+                    <div class="metric-number">@Model.TotalStudents</div>
+                </div>
+                <div class="metric-icon-square metric-icon-blue">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+            <div class="metric-foot">
+                <span><i class="bi bi-database me-1"></i> مجموع پرونده‌ها در پایگاه داده</span>
+                <span class="badge bg-light text-dark font-tabular border">کامل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Active Students -->
+    <div class="col-12 col-md-4">
+        <div class="metric-card-pro metric-card-green">
+            <div class="metric-card-head">
+                <div>
+                    <div class="metric-title">دانشجویان در حال تحصیل</div>
+                    <div class="metric-number text-success">@Model.ActiveStudents</div>
+                </div>
+                <div class="metric-icon-square metric-icon-green">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+            </div>
+            <div class="metric-foot">
+                <span>
+                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                    @(Model.TotalStudents > 0 ? $"{(Model.ActiveStudents * 100 / Model.TotalStudents)}٪" : "۰٪") کل ظرفیت
+                </span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle">مجاز به تحصیل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Majors Count -->
+    <div class="col-12 col-md-4">
+        <a asp-controller="Majors" asp-action="Index" class="text-decoration-none">
+            <div class="metric-card-pro metric-card-indigo">
+                <div class="metric-card-head">
+                    <div>
+                        <div class="metric-title">رشته‌های تحصیلی فعال</div>
+                        <div class="metric-number">@Model.MajorsCount</div>
+                    </div>
+                    <div class="metric-icon-square metric-icon-indigo">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                </div>
+                <div class="metric-foot">
+                    <span><i class="bi bi-diagram-3-fill me-1"></i> دپارتمان‌های فعال دانشگاه</span>
+                    <span class="text-primary fw-bold small">
+                        مدیریت رشته‌ها <i class="bi bi-arrow-left"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- 2. Main Students Table Panel -->
+<div class="panel-pro">
+    <div class="panel-pro-header">
+        <div class="d-flex align-items-center gap-2">
+            <h2 class="panel-pro-title">
+                <i class="bi bi-table text-primary"></i>
+                <span>فهرست جامع دانشجویان</span>
+            </h2>
+            <span class="badge bg-light text-secondary border font-tabular px-2 py-1">
+                @Model.Students.Count رکورد
+            </span>
+        </div>
+
+        <!-- Integrated Search Box -->
+        <div style="min-width: 320px; max-width: 440px; width: 100%;">
+            <form asp-action="Index" method="get" class="search-box-unified">
+                <div class="search-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <input type="text" 
+                       name="search" 
+                       value="@Model.SearchTerm" 
+                       placeholder="جستجو با نام، کد ملی، شماره دانشجویی یا رشته..." />
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a asp-action="Index" class="btn btn-sm btn-link text-muted p-2" title="پاک کردن جستجو">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </a>
+                }
+                <button type="submit">جستجو</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Search Filter Notice -->
+    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+    {
+        <div class="bg-light px-4 py-2 border-bottom d-flex justify-content-between align-items-center small text-secondary">
+            <div>
+                <i class="bi bi-funnel-fill text-primary me-1"></i>
+                <span>نتایج جستجو برای:</span>
+                <strong class="text-dark">«@Model.SearchTerm»</strong>
+                <span class="text-muted">(@Model.Students.Count مورد یافت شد)</span>
+            </div>
+            <a asp-action="Index" class="text-decoration-none fw-bold text-primary">
+                نمایش همه رکوردها
+            </a>
+        </div>
+    }
+
+    <!-- Table or Empty State -->
+    <div class="p-0">
+        @if (Model.Students.Any())
+        {
+            <div class="table-pro-responsive">
+                <table class="table-pro">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;" class="text-center">#</th>
+                            <th style="width: 130px;">شماره دانشجویی</th>
+                            <th>مشخصات دانشجو</th>
+                            <th>کد ملی</th>
+                            <th>رشته تحصیلی</th>
+                            <th>تاریخ ثبت‌نام</th>
+                            <th class="text-center" style="width: 120px;">وضعیت</th>
+                            <th class="text-center" style="width: 160px;">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int idx = 1; }
+                        @foreach (var student in Model.Students)
+                        {
+                            var initial = !string.IsNullOrEmpty(student.FirstName) ? student.FirstName.Substring(0, 1) : "د";
+                            <tr>
+                                <td class="text-center text-muted font-tabular">@idx</td>
+                                <td>
+                                    <span class="badge-code">
+                                        @student.StudentNumber
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="student-meta-cell">
+                                        <div class="student-avatar">
+                                            @initial
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <span class="student-name-strong">@student.FirstName @student.LastName</span>
+                                            <span class="student-id-sub font-tabular">پرونده: #@student.Id</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="font-tabular text-secondary">@student.NationalCode</td>
+                                <td>
+                                    <span class="badge-major">
+                                        <i class="bi bi-mortarboard text-indigo-500"></i>
+                                        <span>@(student.Major?.Title ?? "تعیین نشده")</span>
+                                    </span>
+                                </td>
+                                <td class="font-tabular text-muted small">
+                                    @student.EnrollmentDate.ToString("yyyy/MM/dd")
+                                </td>
+                                <td class="text-center">
+                                    @if (student.IsActive)
+                                    {
+                                        <span class="badge-status badge-status-active">
+                                            فعال
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status badge-status-inactive">
+                                            غیرفعال
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="Edit" asp-route-id="@student.Id" class="btn-icon-action btn-icon-action-edit" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                            <span>ویرایش</span>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@student.Id" class="btn-icon-action btn-icon-action-delete" title="حذف">
+                                            <i class="bi bi-trash"></i>
+                                            <span>حذف</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 px-3">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle text-muted p-4 mb-3" style="width: 75px; height: 75px;">
+                    <i class="bi bi-search fs-2"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">هیچ دانشجویی یافت نشد</h5>
+                <p class="text-muted small mb-3">
+                    @(string.IsNullOrWhiteSpace(Model.SearchTerm) 
+                        ? "هنوز هیچ دانشجویی در سیستم ثبت نشده است." 
+                        : "هیچ رکوردی منطبق با عبارت مورد نظر پیدا نشد.")
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                    {
+                        <a asp-action="Index" class="btn-brand btn-brand-neutral">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>نمایش همه دانشجویان</span>
+                        </a>
+                    }
+                    <a asp-action="Create" class="btn-brand btn-brand-primary">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>ثبت اولین دانشجو</span>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

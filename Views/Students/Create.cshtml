@@ -1,0 +1,163 @@
+@model AKP.Models.Student
+
+@{
+    ViewData["Title"] = "ثبت‌نام دانشجوی جدید";
+}
+
+<!-- Page Header Bar -->
+<div class="page-header-pro">
+    <div class="page-header-title-box">
+        <ul class="breadcrumb-pro">
+            <li><a asp-action="Index">سامانه</a></li>
+            <li class="divider"><i class="bi bi-chevron-left"></i></li>
+            <li><a asp-action="Index">میزکار دانشجویان</a></li>
+            <li class="divider"><i class="bi bi-chevron-left"></i></li>
+            <li class="text-dark fw-bold">ثبت دانشجوی جدید</li>
+        </ul>
+        <h1>تشکیل پرونده و ثبت‌نام دانشجو</h1>
+        <p>اطلاعات هویتی و دپارتمان آموزشی دانشجو را با دقت در سامانه ثبت نمایید.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn-brand btn-brand-neutral">
+            <i class="bi bi-arrow-right"></i>
+            <span>بازگشت به فهرست</span>
+        </a>
+    </div>
+</div>
+
+<div class="form-bounded-card">
+    <div class="panel-pro">
+        <div class="panel-pro-header">
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="panel-pro-title">
+                    <i class="bi bi-person-plus-fill text-primary"></i>
+                    <span>فرم پذیرش و ثبت مشخصات دانشجو</span>
+                </h2>
+            </div>
+            <span class="text-muted small">فیلدهای دارای ستاره (*) الزامی هستند.</span>
+        </div>
+
+        <div class="p-4 p-md-5">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-toast alert-toast-danger mb-4" role="alert"></div>
+
+                <!-- Section 1: اطلاعات هویتی -->
+                <div class="mb-4">
+                    <div class="form-legend-box">
+                        <i class="bi bi-person-vcard text-primary fs-5"></i>
+                        <span>۱. اطلاعات هویتی و شناسنامه‌ای</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label asp-for="FirstName" class="form-label-elegant">نام *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-person"></i></div>
+                                <input asp-for="FirstName" class="form-control" placeholder="مثال: سارا" autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="FirstName" class="validation-error-text"></span>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label asp-for="LastName" class="form-label-elegant">نام خانوادگی *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-person"></i></div>
+                                <input asp-for="LastName" class="form-control" placeholder="مثال: رضایی" autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="LastName" class="validation-error-text"></span>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NationalCode" class="form-label-elegant">کد ملی (۱۰ رقم) *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-card-heading"></i></div>
+                                <input asp-for="NationalCode" class="form-control font-tabular" placeholder="مثال: 0012345678" maxlength="10" />
+                            </div>
+                            <span asp-validation-for="NationalCode" class="validation-error-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: مشخصات آموزشی -->
+                <div class="mb-4">
+                    <div class="form-legend-box">
+                        <i class="bi bi-mortarboard text-primary fs-5"></i>
+                        <span>۲. سوابق و وضعیت آموزشی</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label asp-for="StudentNumber" class="form-label-elegant">شماره دانشجویی *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-hash"></i></div>
+                                <input asp-for="StudentNumber" class="form-control font-tabular" placeholder="مثال: 40112345" />
+                            </div>
+                            <span asp-validation-for="StudentNumber" class="validation-error-text"></span>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label asp-for="MajorId" class="form-label-elegant">رشته تحصیلی *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-book"></i></div>
+                                <select asp-for="MajorId" asp-items="ViewBag.Majors" class="form-select">
+                                    <option value="">-- انتخاب رشته تحصیلی --</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <span asp-validation-for="MajorId" class="validation-error-text m-0"></span>
+                                <a asp-controller="Majors" asp-action="Index" class="text-primary small text-decoration-none fw-semibold">
+                                    + تعریف رشته جدید
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label asp-for="EnrollmentDate" class="form-label-elegant">تاریخ ثبت‌نام *</label>
+                            <div class="input-container-elegant">
+                                <div class="field-icon"><i class="bi bi-calendar3"></i></div>
+                                <input asp-for="EnrollmentDate" class="form-control font-tabular" type="date" />
+                            </div>
+                            <span asp-validation-for="EnrollmentDate" class="validation-error-text"></span>
+                        </div>
+
+                        <!-- Active status switch -->
+                        <div class="col-12 mt-3">
+                            <div class="p-3 bg-light rounded border d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-dark small mb-1">
+                                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                        وضعیت پرونده: مجاز به تحصیل (فعال)
+                                    </div>
+                                    <div class="text-muted small">
+                                        در صورت فعال بودن، دانشجو می‌تواند در انتخاب واحد نیم‌سال جاری شرکت نماید.
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0 fs-4">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="activeStatusCheck" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn-brand btn-brand-neutral">
+                        <i class="bi bi-x-lg"></i>
+                        <span>انصراف</span>
+                    </a>
+                    <button type="submit" class="btn-brand btn-brand-primary px-4 shadow-sm">
+                        <i class="bi bi-check2"></i>
+                        <span>ثبت و صدور پرونده</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
